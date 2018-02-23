@@ -1,6 +1,14 @@
 package com.sd.nytarticles;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.sd.nytarticles.database.ArticleBaseHelper;
+import com.sd.nytarticles.database.ArticleCursorWrapper;
+import com.sd.nytarticles.database.ArticleDbSchema;
+import com.sd.nytarticles.database.ArticleDbSchema.ArticleTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +24,10 @@ public class ArticleLab {
     private List<ListItem> mMostViewedList;
     private List<ListItem> mMostSharedList;
     private List<ListItem> mMostEmailedList;
+    private List<ListItem> mFavouriteList;
+
+    private Context mContext;
+    private SQLiteDatabase mDatabase;
 
     public static ArticleLab get(Context context){
         if (sArticleLab == null){
@@ -25,9 +37,14 @@ public class ArticleLab {
     }
 
     private ArticleLab(Context context){
+        mContext = context.getApplicationContext();
+        mDatabase = new ArticleBaseHelper(mContext).getWritableDatabase();
+
         mMostViewedList = new ArrayList<>();
         mMostEmailedList = new ArrayList<>();
         mMostSharedList = new ArrayList<>();
+        mFavouriteList = new ArrayList<>();
+
     }
 
     public List<ListItem> getList(int i){
@@ -38,6 +55,20 @@ public class ArticleLab {
                 return mMostEmailedList;
             case 2:
                 return mMostSharedList;
+            case 3:
+                mFavouriteList.clear();
+                ArticleCursorWrapper cursor = queryArticles(null, null);
+
+                try{
+                    cursor.moveToFirst();
+                    while (!cursor.isAfterLast()){
+                        mFavouriteList.add(cursor.getArticle());
+                        cursor.moveToNext();
+                    }
+                }finally {
+                    cursor.close();
+                }
+                return mFavouriteList;
             default:
                 return null;
         }
@@ -71,6 +102,9 @@ public class ArticleLab {
             case 2:
                 list = mMostSharedList;
                 break;
+            case 3:
+                list = mFavouriteList;
+                break;
             default:
                 break;
         }
@@ -80,5 +114,48 @@ public class ArticleLab {
             }
         }
         return null;
+    }
+
+    private static ContentValues getContentValues(ListItem item){
+        ContentValues values = new ContentValues();
+        values.put(ArticleTable.Cols.UUID, item.getId().toString());
+        values.put(ArticleTable.Cols.TITLE, item.getCaption());
+        values.put(ArticleTable.Cols.COLUMN, item.getColumn());
+        values.put(ArticleTable.Cols.SECTION, item.getSection());
+        values.put(ArticleTable.Cols.ABSTRACT, item.getAbstract());
+        values.put(ArticleTable.Cols.BYLINE, item.getByline());
+        values.put(ArticleTable.Cols.URL, item.getUrl());
+        values.put(ArticleTable.Cols.IMAGE_URL, item.getImageUrl());
+
+        return values;
+    }
+
+    public void addToFavourite(ListItem item){
+        boolean isChecked = false;
+        for(ListItem listItem : mFavouriteList){
+            if (item.getUrl().equals(listItem.getUrl())){
+                isChecked = true;
+            }
+        }
+
+        if(!isChecked) {
+            ContentValues values = getContentValues(item);
+
+            mDatabase.insert(ArticleTable.NAME, null, values);
+        }
+    }
+
+    private ArticleCursorWrapper queryArticles(String whereClause, String [] whereArgs){
+        Cursor cursor = mDatabase.query(
+                ArticleTable.NAME,
+                null,
+                whereClause,
+                whereArgs,
+                null,
+                null,
+                null
+        );
+
+        return new ArticleCursorWrapper(cursor);
     }
 }

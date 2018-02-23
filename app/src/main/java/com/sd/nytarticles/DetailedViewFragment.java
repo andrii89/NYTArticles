@@ -66,10 +66,15 @@ public class DetailedViewFragment extends Fragment {
         mBylineTextView.setText(mItem.getByline());
 
         mCheckBox = (CheckBox)view.findViewById(R.id.favourite_checkbox);
+        mCheckBox.setChecked(mItem.getChecked());
         mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                if(isChecked){
+                    ArticleLab.get(getActivity()).addToFavourite(mItem);
+                } else {
+                    mItem.setChecked(false);
+                }
             }
         });
 

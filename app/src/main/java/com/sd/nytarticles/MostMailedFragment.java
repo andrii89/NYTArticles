@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class MostMailedFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         new NYTItemsTask().execute();
 
+        updateUI();
         setupAdapter();
 
         return view;
@@ -54,6 +56,16 @@ public class MostMailedFragment extends Fragment {
             mTitleTextView = (TextView) itemView.findViewById(R.id.title_textview);
 
             mFavouriteCheckBox = (CheckBox) itemView.findViewById(R.id.favourite_checkbox);
+            mFavouriteCheckBox.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(isChecked){
+                        ArticleLab.get(getActivity()).addToFavourite(listItem);
+                    } else {
+                        listItem.setChecked(false);
+                    }
+                }
+            });
         }
 
         @Override
@@ -111,7 +123,31 @@ public class MostMailedFragment extends Fragment {
         protected void onPostExecute(List<ListItem> items){
             mItems = items;
             ArticleLab.get(getContext()).setList(1, items);
+            updateUI();
             setupAdapter();
+        }
+    }
+
+    private void updateUI(){
+        ArticleLab articleLab = ArticleLab.get(getActivity());
+        List<ListItem> articles = articleLab.getList(1);
+
+        List<ListItem> mFItems = ArticleLab.get(getActivity()).getList(3);
+        for(ListItem item : mFItems){
+            for(int i = 0; i < 3; i++){
+                List<ListItem> list = ArticleLab.get(getActivity()).getList(i);
+                for(ListItem listItem : list){
+                    if(listItem.getUrl().equals(item.getUrl())){
+                        listItem.setChecked(true);
+                    }
+                }
+            }
+        }
+
+        if (mRecyclerView.getAdapter() == null){
+            setupAdapter();
+        } else{
+            mRecyclerView.getAdapter().notifyDataSetChanged();
         }
     }
 }

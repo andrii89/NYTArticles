@@ -10,10 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.support.v7.appcompat.R.styleable.CompoundButton;
 
 /**
  * Created by AzAlex2 on 20.02.2018.
@@ -34,6 +37,7 @@ public class MostViewedFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         new NYTItemsTask().execute();
 
+        updateUI();
         setupAdapter();
 
         return view;
@@ -54,6 +58,16 @@ public class MostViewedFragment extends Fragment {
             mTitleTextView = (TextView) itemView.findViewById(R.id.title_textview);
 
             mFavouriteCheckBox = (CheckBox) itemView.findViewById(R.id.favourite_checkbox);
+            mFavouriteCheckBox.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(isChecked){
+                        ArticleLab.get(getActivity()).addToFavourite(listItem);
+                    } else {
+                        listItem.setChecked(false);
+                    }
+                }
+            });
         }
 
         @Override
@@ -111,7 +125,31 @@ public class MostViewedFragment extends Fragment {
         protected void onPostExecute(List<ListItem> items){
             mItems = items;
             ArticleLab.get(getContext()).setList(0, items);
+            updateUI();
             setupAdapter();
+        }
+    }
+
+    private void updateUI(){
+        ArticleLab articleLab = ArticleLab.get(getActivity());
+        List<ListItem> articles = articleLab.getList(0);
+
+        List<ListItem> mFItems = ArticleLab.get(getActivity()).getList(3);
+        for(ListItem item : mFItems){
+            for(int i = 0; i < 3; i++){
+                List<ListItem> list = ArticleLab.get(getActivity()).getList(i);
+                for(ListItem listItem : list){
+                    if(listItem.getUrl().equals(item.getUrl())){
+                        listItem.setChecked(true);
+                    }
+                }
+            }
+        }
+
+        if (mRecyclerView.getAdapter() == null){
+            setupAdapter();
+        } else{
+            mRecyclerView.getAdapter().notifyDataSetChanged();
         }
     }
 }

@@ -106,7 +106,7 @@ public class NYTConnect {
             ListItem item = new ListItem();
             item.setAbstract(articleJsonObject.getString("abstract"));
             item.setByline(articleJsonObject.getString("byline"));
-            item.setCaption(articleJsonObject.getString("title"), i);
+            item.setCaption(articleJsonObject.getString("title"));
             item.setColumn(articleJsonObject.getString("column"));
             item.setSection(articleJsonObject.getString("section"));
             item.setPublishedDate(articleJsonObject.getString("published_date"));

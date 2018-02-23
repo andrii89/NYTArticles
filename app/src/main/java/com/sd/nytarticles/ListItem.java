@@ -24,8 +24,13 @@ public class ListItem {
         mChecked = false;
     }
 
-    public void setCaption(String caption, int index) {
-        mCaption = (index + 1) + ". " + caption;
+    public ListItem (UUID id) {
+        mId = id;
+        mChecked = true;
+    }
+
+    public void setCaption(String caption) {
+        mCaption = caption;
     }
 
     public void setChecked(Boolean checked) {
