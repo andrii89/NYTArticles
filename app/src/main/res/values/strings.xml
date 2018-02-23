@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">NYTArticles</string>
+    <string name="column">COLUMN:</string>
+    <string name="section">SECTION:</string>
+    <string name="abstract_text">ABSTRACT:</string>
+    <string name="published_date">PUBLISHED:</string>
+    <string name="byline">BYLINE:</string>
+    <string name="read">FULL TEXT</string>
+</resources>
