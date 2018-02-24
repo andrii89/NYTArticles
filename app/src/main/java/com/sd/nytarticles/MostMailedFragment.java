@@ -41,6 +41,13 @@ public class MostMailedFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        updateUI();
+    }
+
     private class ArticleHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener{
 
@@ -63,6 +70,7 @@ public class MostMailedFragment extends Fragment {
                         ArticleLab.get(getActivity()).addToFavourite(listItem);
                     } else {
                         listItem.setChecked(false);
+                        ArticleLab.get(getActivity()).deleteFavourite(listItem);
                     }
                 }
             });

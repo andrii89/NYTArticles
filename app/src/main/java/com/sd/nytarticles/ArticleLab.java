@@ -145,6 +145,10 @@ public class ArticleLab {
         }
     }
 
+    public void deleteFavourite(ListItem item){
+        mDatabase.delete(ArticleTable.NAME, ArticleTable.Cols.URL + " = ?", new String[] {item.getUrl()});
+    }
+
     private ArticleCursorWrapper queryArticles(String whereClause, String [] whereArgs){
         Cursor cursor = mDatabase.query(
                 ArticleTable.NAME,

@@ -74,6 +74,7 @@ public class DetailedViewFragment extends Fragment {
                     ArticleLab.get(getActivity()).addToFavourite(mItem);
                 } else {
                     mItem.setChecked(false);
+                    ArticleLab.get(getActivity()).deleteFavourite(mItem);
                 }
             }
         });

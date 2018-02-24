@@ -1,5 +1,6 @@
 package com.sd.nytarticles;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -43,6 +44,13 @@ public class MostViewedFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        updateUI();
+    }
+
     private class ArticleHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener{
 
@@ -65,6 +73,7 @@ public class MostViewedFragment extends Fragment {
                         ArticleLab.get(getActivity()).addToFavourite(listItem);
                     } else {
                         listItem.setChecked(false);
+                        ArticleLab.get(getActivity()).deleteFavourite(listItem);
                     }
                 }
             });

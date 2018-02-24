@@ -43,6 +43,13 @@ public class FavouriteFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        updateUI();
+    }
+
     private class ArticleHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener{
 
