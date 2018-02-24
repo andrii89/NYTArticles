@@ -143,10 +143,28 @@ public class ArticleLab {
 
             mDatabase.insert(ArticleTable.NAME, null, values);
         }
+
+        for(int i = 0; i < 3; i++){
+            List<ListItem> list = getList(i);
+            for(ListItem listItem : list){
+                if(listItem.getUrl().equals(item.getUrl())){
+                    listItem.setChecked(true);
+                }
+            }
+        }
     }
 
     public void deleteFavourite(ListItem item){
         mDatabase.delete(ArticleTable.NAME, ArticleTable.Cols.URL + " = ?", new String[] {item.getUrl()});
+
+        for(int i = 0; i < 3; i++){
+            List<ListItem> list = getList(i);
+            for(ListItem listItem : list){
+                if(listItem.getUrl().equals(item.getUrl())){
+                    listItem.setChecked(false);
+                }
+            }
+        }
     }
 
     private ArticleCursorWrapper queryArticles(String whereClause, String [] whereArgs){

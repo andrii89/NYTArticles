@@ -68,7 +68,11 @@ public class FavouriteFragment extends Fragment {
             mFavouriteCheckBox.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                    if(!isChecked){
+                        listItem.setChecked(false);
+                        ArticleLab.get(getActivity()).deleteFavourite(listItem);
+                        updateUI();
+                    }
                 }
             });
         }

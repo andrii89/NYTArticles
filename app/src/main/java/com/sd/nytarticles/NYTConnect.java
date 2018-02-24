@@ -74,6 +74,7 @@ public class NYTConnect {
                 break;
             default:
                 mUrl = MOST_VIEWED_URL;
+                break;
         }
 
         List<ListItem> items = new ArrayList<>();

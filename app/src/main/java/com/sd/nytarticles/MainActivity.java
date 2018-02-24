@@ -42,13 +42,15 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
                 switch (position) {
                     case 0:
                         // Most Emailed fragment activity
-                        return new MostMailedFragment();
+                        return MostEmailedFragment.newInstance(R.layout.fragment_most_mailed, R.id.most_mailed_recycler_view, 1);
                     case 1:
                         // Most Shared fragment activity
-                        return new MostSharedFragment();
+
+                        return MostSharedFragment.newInstance(R.layout.fragment_most_shared, R.id.most_shared_recycler_view, 2);
                     case 2:
                         // Most Viewed fragment activity
-                        return new MostViewedFragment();
+
+                        return MostViewedFragment.newInstance(R.layout.fragment_most_viewed, R.id.most_viewed_recycler_view, 0);
                     case 3:
                         // Favourite fragment activity
                         return new FavouriteFragment();
@@ -62,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
                 // get item count - equal to number of tabs
                 return 4;
             }
+
         });
 
         mActionBar.setHomeButtonEnabled(false);
@@ -109,15 +112,5 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
     }
-
-    /*private class NYTItemsTask extends AsyncTask<Void, Void, Void>{
-        @Override
-        protected Void doInBackground(Void... params){
-            new NYTConnect().fetchItems(0);
-            new NYTConnect().fetchItems(1);
-            new NYTConnect().fetchItems(2);
-            return null;
-        }
-    }*/
 
 }

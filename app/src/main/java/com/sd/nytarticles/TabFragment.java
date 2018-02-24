@@ -20,19 +20,44 @@ import java.util.List;
  * Created by AzAlex2 on 20.02.2018.
  */
 
-public class MostMailedFragment extends Fragment {
+public class TabFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private List<ListItem> mItems = new ArrayList<>();
+    private static int sLayout;
+    private static int sFragmentView;
+    private static int sTabIdx;
+    private final int mLayout;
+    private final int mFragmentView;
+    private final int tabIdx;
+
+    public TabFragment(){
+        mLayout = sLayout;
+        mFragmentView = sFragmentView;
+        tabIdx = sTabIdx;
+    }
+
+
+    //create new instance of the fragment
+    public static TabFragment newInstance(int layout, int view, int tab){
+
+        sLayout = layout;
+        sFragmentView = view;
+        sTabIdx = tab;
+
+        TabFragment fragment = new TabFragment();
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_most_mailed, container, false);
+        View view = inflater.inflate(mLayout, container, false);
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.most_mailed_recycler_view);
+        mRecyclerView = (RecyclerView) view.findViewById(mFragmentView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        setRetainInstance(true);
         new NYTItemsTask().execute();
 
         updateUI();
@@ -78,7 +103,7 @@ public class MostMailedFragment extends Fragment {
 
         @Override
         public void onClick(View view){
-            Intent intent = DetailedViewActivity.newIntent(getActivity(), listItem.getId(), 1);
+            Intent intent = DetailedViewActivity.newIntent(getActivity(), listItem.getId(), tabIdx);
             startActivity(intent);
         }
 
@@ -124,21 +149,19 @@ public class MostMailedFragment extends Fragment {
     private class NYTItemsTask extends AsyncTask<Void, Void, List<ListItem>> {
         @Override
         protected List<ListItem> doInBackground(Void... params){
-            return new NYTConnect().fetchItems(1);
+            return new NYTConnect().fetchItems(tabIdx);
         }
 
         @Override
         protected void onPostExecute(List<ListItem> items){
             mItems = items;
-            ArticleLab.get(getContext()).setList(1, items);
+            ArticleLab.get(getContext()).setList(tabIdx, items);
             updateUI();
             setupAdapter();
         }
     }
 
     private void updateUI(){
-        ArticleLab articleLab = ArticleLab.get(getActivity());
-        List<ListItem> articles = articleLab.getList(1);
 
         List<ListItem> mFItems = ArticleLab.get(getActivity()).getList(3);
         for(ListItem item : mFItems){
@@ -159,3 +182,4 @@ public class MostMailedFragment extends Fragment {
         }
     }
 }
+
