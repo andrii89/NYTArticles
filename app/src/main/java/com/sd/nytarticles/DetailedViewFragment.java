@@ -2,15 +2,21 @@ package com.sd.nytarticles;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.UUID;
@@ -22,8 +28,11 @@ import java.util.UUID;
 
 public class DetailedViewFragment extends Fragment {
 
+    private static final String TAG = "DetailedViewFragment";
+
     ListItem mItem;
 
+    private ImageView mItemImageView;
     private TextView mTitleTextView;
     private TextView mColumnTextView;
     private TextView mSectionTextView;
@@ -33,6 +42,8 @@ public class DetailedViewFragment extends Fragment {
     private CheckBox mCheckBox;
     private Button mButton;
 
+    private ImageDownloader<ImageView> mImageDownloader;
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -41,11 +52,29 @@ public class DetailedViewFragment extends Fragment {
         int listIdx = (int) getActivity().getIntent().getSerializableExtra(DetailedViewActivity.EXTRA_LIST_IDX);
         mItem = ArticleLab.get(getActivity()).getArticle(itemId, listIdx);
 
+        Handler responseHandler = new Handler();
+        mImageDownloader = new ImageDownloader<>(responseHandler);
+        mImageDownloader.setImageDownloadListener(
+                new ImageDownloader.ImageDownloadListener<ImageView>(){
+                    @Override
+                    public void onImageDownloaded(ImageView imageView, Bitmap bitmap){
+                        Drawable drawable = new BitmapDrawable(getResources(), bitmap);
+                        setDrawable(drawable);
+                    }
+                }
+        );
+        mImageDownloader.start();
+        mImageDownloader.getLooper();
+        Log.i(TAG, "Background thread started");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.fragment_detailed_view,container, false);
+
+        mItemImageView = (ImageView)view.findViewById(R.id.imageview);
+        setDrawable(null);
+        mImageDownloader.queueImage(mItemImageView, mItem.getImageUrl());
 
         mTitleTextView = (TextView)view.findViewById(R.id.title_textview);
         mTitleTextView.setText(mItem.getCaption());
@@ -90,5 +119,26 @@ public class DetailedViewFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        mImageDownloader.quit();
+        Log.i(TAG, "Background thread destroyed");
+    }
+
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        mImageDownloader.clearQueue();
+    }
+
+    private void setDrawable(Drawable drawable){
+        if(drawable == null){
+            mItemImageView.setImageDrawable(getResources().getDrawable(R.drawable.no_image));
+        } else {
+            mItemImageView.setImageDrawable(drawable);
+        }
     }
 }

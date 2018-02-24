@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
                         return MostEmailedFragment.newInstance(R.layout.fragment_most_mailed, R.id.most_mailed_recycler_view, 1);
                     case 1:
                         // Most Shared fragment activity
-
                         return MostSharedFragment.newInstance(R.layout.fragment_most_shared, R.id.most_shared_recycler_view, 2);
                     case 2:
                         // Most Viewed fragment activity

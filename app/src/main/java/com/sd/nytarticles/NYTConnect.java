@@ -124,7 +124,8 @@ public class NYTConnect {
                     }
                 }
             } catch (Exception e){
-                item.setImageUrl("");
+                item.setImageUrl(null);
+                Log.e(TAG, "Image is not available");
             }
 
             items.add(item);
